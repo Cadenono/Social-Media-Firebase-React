@@ -49,31 +49,6 @@ export default function NewPost() {
     setImage(selected);
   };
 
-  // const uploadFile = (file) => {
-  //   if (file) {
-  //     const storage = getStorage();
-  //     const storageRef = ref(storage, `images/${user.uid}/${file.name}`);
-  //     const uploadTask = uploadString(storageRef, file, "data_url");
-
-  //     uploadTask.on(
-  //       "state_changed",
-  //       null,
-  //       (error) => {
-  //         alert(error);
-  //       },
-  //       () => {
-  //         getDownloadURL(uploadTask.snapshot.ref).then((URL) => {
-  //           setDoc(
-  //             doc(db, "posts", docum.id),
-  //             { postImage: URL },
-  //             { merge: true }
-  //           );
-  //         });
-  //       }
-  //     );
-  //     removeImage();
-  //   }
-  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -95,6 +70,7 @@ export default function NewPost() {
           displayName: user.displayName,
           imgURL: url,
           comments: [],
+          likes: [],
         })
       );
     });
@@ -102,19 +78,6 @@ export default function NewPost() {
     setPost("");
     history.push("/home");
   };
-
-  //   await addDoc(collection(db, "posts"), {
-  //     uid: user.uid,
-  //     caption: caption,
-  //     post: post,
-  //     timestamp: serverTimestamp(),
-  //     displayName: user.displayName,
-  //     imgURL:
-
-  //   });
-  //   setCaption("");
-  //   setPost("");
-  // };
 
   return (
     <>

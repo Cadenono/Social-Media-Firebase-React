@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import { useAuthContext } from "../hooks/useAuthContext";
 import ModalComponent from "./ModalComponent";
 import CommentModal from "./CommentModal";
+import { useCollection } from "../hooks/useCollection";
 
 export default function Post({ posts }) {
   const { user } = useAuthContext();
@@ -21,9 +22,10 @@ export default function Post({ posts }) {
   useEffect(() => innerRef.current && innerRef.current.focus());
   const [comment, setComment] = useState("");
   const [show, setShow] = useState(false);
-  const [likeState, setLikeState] = useState(false);
+  // const [likeState, setLikeState] = useState(false);
   const [postDetails, setPostDetails] = useState("");
   const [postDetails2, setPostDetails2] = useState("");
+  const { documents } = useCollection("posts");
 
   const handleClose = () => setShow(false);
   const handleShow = (post) => {
@@ -60,53 +62,62 @@ export default function Post({ posts }) {
   const handleViewMoreDetails = (post) => {
     handleShowDetails(post);
   };
-  // const AddCommentForm = () => {
-  //   return (
-  //     <form style={{ padding: "5%" }}>
-  //       <span>
-  //         <h1>New Comment </h1>{" "}
-  //         <button
-  //           style={{
-  //             margin: 0,
-  //             position: "absolute",
-  //             opacity: 1,
-  //             zIndex: 10,
-  //             cursor: "pointer",
-  //             bottom: "50px",
-  //             right: "50px",
-  //           }}
-  //           className="btn"
-  //           onClick={handleCommentSubmit}
-  //         >
-  //           Submit
-  //         </button>
-  //       </span>
+  const timeNow = new Date()
+    .toLocaleString()
+    .replace(",", "")
+    .replace(/:.. /, " ");
 
-  //       <input
-  //         type="textarea"
-  //         ref={innerRef}
-  //         onChange={(e) => setComment(e.target.value)}
-  //         value={comment}
-  //         style={{ height: "20vh", display: "block" }}
-  //         name="comment"
-  //         maxlength="100"
-  //       />
-  //     </form>
-  //   );
-  // };
-
-  const handleClick = async (post) => {
-    console.log(post.id);
-    await setDoc(doc(db, "posts", post.id), {
-      uid: post.uid,
-      caption: post.caption,
-      displayName: post.displayName,
-      imgURL: post.imgURL,
-      timestamp: post.timestamp,
-      post: post.post,
-      likeStatus: true,
-    });
+  let likeObjectToAdd = {
+    displayName: user.displayName,
+    uid: user.uid,
+    updatedAt: timeNow,
+    id: Math.random(),
+    likeStatus: true,
   };
+  let likeState;
+
+  const [userLikeState, setUserLikeState] = useState(null);
+  const handleClick = async (post) => {
+    const docRef = doc(db, "posts", post.id);
+
+    let existArray = post.likes.filter(
+      (likeObj) => likeObj["uid"] === user.uid
+    );
+
+    if (existArray.length === 0) {
+      const updatedDocument = await updateDoc(docRef, {
+        likes: [...post.likes, likeObjectToAdd],
+      });
+      likeState = true;
+    } else {
+      post.likes = post.likes.filter(function (likeObj) {
+        return likeObj.uid !== user.uid;
+      });
+      const updatedDocument = await updateDoc(docRef, {
+        likes: post.likes,
+      });
+
+      // likeState = numExist[0].likeStatus;
+      likeState = false;
+    }
+    setUserLikeState(likeState);
+  };
+
+  //loop thru array & search if user object exists in like array
+  //only add like if user is not himself!!
+  // if doesn't exist, append it with likeStatus = true
+  //else, append the opposite status
+
+  // console.log(post.id);
+  // await setDoc(doc(db, "posts", post.id), {
+  //   uid: post.uid,
+  //   caption: post.caption,
+  //   displayName: post.displayName,
+  //   imgURL: post.imgURL,
+  //   timestamp: post.timestamp,
+  //   post: post.post,
+  //   likeStatus: true,
+  // });
 
   const handleDelete = async (id) => {
     const ref = doc(db, "posts", id);
@@ -219,11 +230,11 @@ export default function Post({ posts }) {
                       scale: 1.1,
                       opacity: 0.6,
                     }}
-                    style={post.likeStatus ? { color: "red" } : {}}
+                    style={userLikeState ? { color: "red" } : {}}
                     className="icons fas fa-heart"
                     onClick={() => handleClick(post)}
                   >
-                    LIKE
+                    {post.likes.length} LIKE
                   </motion.i>
                   <motion.i
                     whileHover={{

@@ -23,7 +23,7 @@ export default function ModalComponent({ postDetails }) {
             </div>
             Post: {postDetails.post}
             <h2>Comments: </h2>
-            {postDetails.comments.length > 0 &&
+            {postDetails.comments.length > 0 ? (
               postDetails.comments.map((comment) => (
                 <>
                   <ul
@@ -54,7 +54,10 @@ export default function ModalComponent({ postDetails }) {
                     </li>
                   </ul>
                 </>
-              ))}
+              ))
+            ) : (
+              <p>No comments yet.</p>
+            )}
           </div>
         </Card.Text>
       </Card.Body>
