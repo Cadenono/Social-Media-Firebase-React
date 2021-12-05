@@ -1,13 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Card } from "react-bootstrap";
 import { db } from "../firebase/config";
-import {
-  doc,
-  deleteDoc,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { Modal } from "react-bootstrap";
 import loginImg from "../images/login.png";
 import { motion } from "framer-motion";
@@ -22,42 +16,26 @@ export default function Post({ posts }) {
   useEffect(() => innerRef.current && innerRef.current.focus());
   const [comment, setComment] = useState("");
   const [show, setShow] = useState(false);
-  // const [likeState, setLikeState] = useState(false);
+
   const [postDetails, setPostDetails] = useState("");
   const [postDetails2, setPostDetails2] = useState("");
   const { documents } = useCollection("posts");
-
+  console.log("doc", documents);
   const handleClose = () => setShow(false);
   const handleShow = (post) => {
     setShow(true);
     setPostDetails2(post);
-
-    // console.log(post.id);
   };
 
   const handlePostDetailsForComments = (post) => {
     handleShow(post);
   };
 
-  // const handleCommentSubmit = (e) => {
-  //   e.preventDefault();
-  //   const timeNow = serverTimestamp();
-  //   const commentToAdd = {
-  //     displayName: user.displayName,
-  //     content: comment,
-  //     createdAt: timeNow,
-  //     id: Math.random(),
-  //   };
-
-  //   console.log(commentToAdd);
-  //   setComment("");
-  // };
   const [showDetails, setShowDetails] = useState(false);
   const handleCloseDetails = () => setShowDetails(false);
   const handleShowDetails = (post) => {
     setShowDetails(true);
     setPostDetails(post);
-    // console.log(post);
   };
   const handleViewMoreDetails = (post) => {
     handleShowDetails(post);
@@ -77,6 +55,21 @@ export default function Post({ posts }) {
   let likeState;
 
   const [userLikeState, setUserLikeState] = useState(null);
+
+  useEffect(() => {
+    documents &&
+      documents.map(async (doc) => {
+        // console.log("doc", doc);
+        let existArray = await doc.likes.filter(
+          (likeObj) => likeObj["uid"] === user.uid
+        );
+        if (existArray.length > 0) {
+          console.log("exist arry", existArray);
+          setUserLikeState(existArray[0].likeStatus);
+        }
+      });
+  }, [documents]);
+
   const handleClick = async (post) => {
     const docRef = doc(db, "posts", post.id);
 
@@ -88,7 +81,7 @@ export default function Post({ posts }) {
       const updatedDocument = await updateDoc(docRef, {
         likes: [...post.likes, likeObjectToAdd],
       });
-      likeState = true;
+      localStorage.setItem(post.id, "liked");
     } else {
       post.likes = post.likes.filter(function (likeObj) {
         return likeObj.uid !== user.uid;
@@ -96,28 +89,10 @@ export default function Post({ posts }) {
       const updatedDocument = await updateDoc(docRef, {
         likes: post.likes,
       });
-
-      // likeState = numExist[0].likeStatus;
-      likeState = false;
+      localStorage.setItem(post.id, "unliked");
     }
-    setUserLikeState(likeState);
+    window.location.reload();
   };
-
-  //loop thru array & search if user object exists in like array
-  //only add like if user is not himself!!
-  // if doesn't exist, append it with likeStatus = true
-  //else, append the opposite status
-
-  // console.log(post.id);
-  // await setDoc(doc(db, "posts", post.id), {
-  //   uid: post.uid,
-  //   caption: post.caption,
-  //   displayName: post.displayName,
-  //   imgURL: post.imgURL,
-  //   timestamp: post.timestamp,
-  //   post: post.post,
-  //   likeStatus: true,
-  // });
 
   const handleDelete = async (id) => {
     const ref = doc(db, "posts", id);
@@ -230,7 +205,11 @@ export default function Post({ posts }) {
                       scale: 1.1,
                       opacity: 0.6,
                     }}
-                    style={userLikeState ? { color: "red" } : {}}
+                    style={
+                      localStorage.getItem(post.id) === "liked"
+                        ? { color: "red" }
+                        : {}
+                    }
                     className="icons fas fa-heart"
                     onClick={() => handleClick(post)}
                   >
@@ -277,7 +256,14 @@ export default function Post({ posts }) {
               </h4>
               <Card.Text>
                 <div className="form-group">
-                  <Card.Img variant="top" src={loginImg} />
+                  <Card.Img
+                    variant="top"
+                    style={{
+                      maxHeight: "150px",
+                      objectFit: "contain",
+                    }}
+                    src={post.imgURL}
+                  />
                   <div className="grid-container">
                     Posted on{" "}
                     {post &&

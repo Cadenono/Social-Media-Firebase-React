@@ -1,5 +1,5 @@
 import { Card } from "react-bootstrap";
-import loginImg from "../images/login.png";
+import formatDistanceToNow from "date-fns/formatDistanceToNow";
 export default function ModalComponent({ postDetails }) {
   return (
     <Card
@@ -14,7 +14,15 @@ export default function ModalComponent({ postDetails }) {
         <h2 style={{ display: "flex", textDecoration: "underline" }}>
           {postDetails.caption}
         </h2>
-        <Card.Img variant="top" src={loginImg} />
+        <Card.Img
+          variant="top"
+          style={{
+            objectFit: "contain",
+            maxHeight: "400px",
+            border: "2px solid #555",
+          }}
+          src={postDetails.imgURL}
+        />
         <Card.Text>
           <div className="form-group">
             <div className="grid-container">
@@ -38,8 +46,10 @@ export default function ModalComponent({ postDetails }) {
                     }}
                   >
                     <li key={comment.id}>
-                      Written by <b>{comment.displayName}</b> on{" "}
-                      {comment.createdAt}
+                      Written by <b>{comment.displayName}</b>{" "}
+                      {formatDistanceToNow(new Date(comment.createdAt), {
+                        addSuffix: true,
+                      })}
                     </li>
 
                     <li

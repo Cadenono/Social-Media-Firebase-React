@@ -41,7 +41,7 @@ input {
 }
 
 .signup {
-  background-image: url("https://i.pinimg.com/originals/b3/46/bd/b346bdaae55ae58cf9b392a4996fe4a9.png");
+  background-image: url(../../images/signup.png);
   opacity: 0.5;
   height: 100vh;
   background-position: center;

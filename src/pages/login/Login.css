@@ -41,7 +41,7 @@ input {
 }
 
 .login {
-  background-image: url("https://outsidergaming.com/wp-content/uploads/2020/03/Clear-Skies-Beach-Animal-Crossing-New-Horizons.jpg");
+  background-image: url(../../images/login.webp);
   opacity: 0.5;
   height: 100vh;
   background-position: center;

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { serverTimestamp, updateDoc, doc } from "firebase/firestore";
+import { updateDoc, doc, serverTimestamp } from "firebase/firestore";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { db } from "../firebase/config";
 export default function CommentModal({ postDetails2, handleClose }) {

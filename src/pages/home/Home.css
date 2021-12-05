@@ -7,33 +7,17 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  /* background: green; */
-  /* background-image: url("https://www.nintendo.com/content/dam/noa/en_US/wallpapers/animal-crossing/animal-crossing-1.jpg"); */
   align-self: top;
   justify-items: center;
   flex-direction: column;
-
-  /* background-image: url("https://www.nintendo.com/content/dam/noa/en_US/wallpapers/animal-crossing/animal-crossing-1.jpg"); */
 }
-
-/* .grid-item {
-  border-right: 1px solid black;
-  align-items: center;
-  justify-content: center; 
-  display: flex;
-} */
 
 .home-grid-container .card {
   border: 1px solid whitesmoke;
-  /* align-items: center; */
   display: flex;
   justify-content: center;
 }
 
-/* .grid-item .middle {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-} */
 .icons {
   margin: 0 10px;
 }
